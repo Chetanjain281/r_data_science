@@ -1,0 +1,326 @@
+---
+title: "Course Project"
+author: "Group D7"
+output:html_document
+---
+
+ 
+Reading and Displaying Data
+```{r}
+df<-read.csv("C:/Users/cheta/Desktop/cleaned_reviews.csv")
+head(df)
+```
+
+FINDING ROWS WITH NULL VALUES 
+
+```{r}
+rows_with_null<-df[apply(is.na(df),1,any),]
+```
+
+FINDING COLUMNS WITH ANY NULL VALUES
+```{r}
+cols_with_null<- df[apply(is.na(df),2,any)]
+```
+
+PRINTING THE ROWS AND COLUMN WITH NULL VALUES
+```{r}
+print(rows_with_null)
+```
+
+```{r}
+print(cols_with_null)
+```
+
+Displaying Data Dimensions:-
+
+```{r}
+dim(df)
+```
+
+
+Displaying Data Structure:-It provides information about the data types of columns and other data-related details.
+
+```{r}
+str(df)
+```
+
+Summary of Data:-It includes statistics and information about the data in each column.
+```{r}
+summary(df)
+```
+
+Installing the "dplyr" Package:-It is commonly used for data manipulation and transformation.
+
+```{r}
+install.packages("dplyr")
+```
+Loading the "dplyr" Package
+```{r}
+library(dplyr)
+```
+
+Loading the "ggplot2" Package
+```{r}
+library(ggplot2)
+```
+
+Creating a Box Plot
+
+Creating  a box plot that visualizes the distribution of review scores by sentiment.
+```{r}
+boxplot_plot <- ggplot(df, aes(x =sentiments, y =review_score)) +
+  geom_boxplot() +
+  labs(title = "Boxplot")
+print(boxplot_plot)
+```
+Creating a Scatter Plot
+
+Creating the Scatter plot to visualize the relationship between review scores and sentiments.
+```{r}
+library(ggplot2)
+ggplot(data=df,mapping=aes(x=sentiments,y=review_score))+geom_point()
+
+```
+
+Creating a Grouped Box Plot
+
+creates a grouped box plot using "ggplot2" to visualize the distribution of review scores by sentiment.
+
+```{r}
+library(ggplot2)
+ggplot(data=df,mapping=aes(x=sentiments,y=review_score,fill=sentiments))+geom_boxplot()
+
+```
+
+Creating a Scatter Plot for Review Length and Sentiments
+
+Creates a scatter plot to visualize the relationship between sentiments and the length of cleaned reviews.
+
+```{r}
+library(ggplot2)
+ggplot(data=df,mapping=aes(x=sentiments,y=cleaned_review_length))+geom_point()
+
+```
+
+
+Calculating Percentage of Review Scores
+
+Calculate the percentage of each unique value in the review_score column
+
+```{r}
+rating_counts <- table(df$review_score)
+rating_pct <- (rating_counts / nrow(df)) * 100
+print(rating_pct)
+```
+
+Analyzing Text Data
+
+These code chunks focus on analyzing text data, including checking data types, converting text data to character type, checking for missing values, and creating a histogram to visualize word count distribution in the "cleaned_review" column.
+
+```{r}
+barplot(rating_pct, main = "Rating Percentages", xlab = "Rating", ylab = "Percentage", col = "blue")
+```
+
+
+To calculate words per review
+
+check the datatype of the cleaned_review column
+```{r}
+class(df$cleaned_review)
+
+```
+
+convert the text column to character
+```{r}
+df$Text <- as.character(df$cleaned_review)
+```
+
+check the missing value
+```{r}
+sum(is.na(df$Text))
+
+```
+
+
+```{r}
+library(ggplot2)
+WordsPerReview <- sapply(strsplit(df$Text, ' '), length)
+#create the histogram
+ggplot(data = data.frame(WordsPerReview = WordsPerReview), aes(x = WordsPerReview)) +
+  geom_histogram(bins = 100, fill = "blue", color = "black") +
+  xlab("cleaned_review") +  
+  theme_minimal()
+
+
+```
+
+Creating a New Dataframe
+
+```{r}
+new_df <- df[, c('cleaned_review', 'review_score')]
+```
+
+Renaming Column Names
+```{r}
+colnames(new_df) <- c('Rating', 'Review')
+```
+
+Creating Sentiment Mapping Function
+```{r}
+apply_sentiment <- function(Rating) {
+  if (Rating <= 2) {
+    return(0)
+  } else {
+    return(1)
+  }
+}
+
+rating <- 3
+sentiment <- apply_sentiment(rating)
+print(sentiment)
+```
+Setting Warning Conflicts to FALSE
+```{r}
+options(warn.conflicts = FALSE)
+```
+
+
+
+
+
+
+Creating Review Score Visualizations
+
+```{r}
+library(ggplot2)
+library(gridExtra)
+
+# Calculate value counts for review scores
+review_counts <- table(df$review_score)
+
+# Create a count plot
+count_plot <- ggplot(data = df, aes(x = review_score)) +
+  geom_bar() +
+  labs(title = "Review Score Count Plot")
+print(count_plot)
+```
+
+Creating Review Score Visualizations
+```{r}
+# Load the necessary libraries
+library(ggplot2)
+
+# Sample data for review counts
+review_counts <- data.frame(
+  review_score = c("Excellent", "Very Good", "Good", "Fair", "Poor"),
+  n = c(20, 30, 15, 10, 5)
+)
+
+# Create a pie chart
+pie_chart <- ggplot(data = review_counts, aes(x = "", y = n, fill = review_score)) +
+  geom_bar(stat = "identity") +
+  coord_polar(theta = "y") +
+  theme_void() +
+  labs(title = "Review Score Distribution")
+
+# Print the pie chart
+print(pie_chart)
+
+
+```
+
+
+Text Mining and Sentiment Analysis
+```{r}
+install.packages("tm")
+```
+
+
+```{r}
+install.packages("syuzhet")
+```
+
+
+```{r}
+library(tm)
+library(syuzhet)
+```
+
+Sample text data
+```{r}
+text_data <- c(
+  "Its very nice product, i just loved it",
+  "The customer service was terrible.",
+  "The movie was just okay, nothing special.",
+  "I hate this product.",
+  "It was good but not that good",
+  "This is the most excellent product I have used till",
+  "The product is okay, does what it's supposed to do.", 
+  "I'm disappointed with this product; it failed to meet my expectations.", 
+  "This is the best product I've ever used!",
+  "The product is middle-of-the-road, quite what you'd expect.", 
+  "I'm overjoyed with the results; this is a premium quality product!",
+  "Customer service was fine, nothing special but not bad either.", 
+  "The quality is subpar, not what I was hoping for at all.",
+  "I'm incredibly pleased with the customer service; they're fantastic!",
+  "It's a standard service, meets expectations but doesn't exceed them.",
+  "I regret this purchase; the product is not worth the money.", 
+  "Absolutely love how this performs, it's perfect for my needs.",
+  "This service has been a game-changer, so grateful I found it!", 
+  "I'm thrilled with the results, it's just what I was looking for!", 
+  "It's an average item, not bad for the price.", 
+  "The quality of this item is outstanding, exceeded my expectations!",
+  "I'm delighted with my purchase, would buy it again in a heartbeat!",
+  "Service was competent, though it lacked that extra touch.",
+  "This has to be the greatest invention, it makes life so much easier!",
+  "The product works as intended but doesn't stand out in any way.", 
+  "Customer service was unhelpful and frustrating to deal with.", 
+  "This item is fairly ordinary, neither good nor bad.",
+  "It's an adequate product, though there's room for improvement.",
+  "This item is poorly made and started falling apart quickly.",
+  "I'm not satisfied with the service; it was a waste of time.",
+  "The product is far below the quality advertised.",
+  "It's a standard service, meets expectations but doesn't exceed them.",
+  "I had a bad experience with this service; I wouldn't recommend it.",
+  "This has been a letdown; the item does not perform as promised.",
+  "I'm unhappy with the purchase; it's not up to the standard.",
+  "The item is acceptable, but I might try something different next time.",
+  "I love this product",
+  "This is terrible",
+  "It's okay"
+  
+)
+```
+
+
+
+
+Create a data frame with the text data
+```{r}
+df <- data.frame(Text = text_data)
+```
+
+
+Preprocess the text data using the tm package (same as in the previous example)
+Perform sentiment analysis using the syuzhet package.
+```{r}
+sentiments <- get_sentiment(df$Text, method = "afinn")
+```
+
+
+Combine the results with the original data frame
+```{r}
+df <- cbind(df, Sentiment = sentiments)
+```
+
+
+Print the results
+```{r}
+print(df)
+```
+
+```{r}
+df_sorted_ascending <- df[order(df$Sentiment), ]
+
+df_sorted_ascending
+```
